@@ -16,6 +16,7 @@ function postReqOpts(body) {
       Accept: "application/json",
     },
     body: JSON.stringify(body),
+    credentials: "include", // Ensure cookies are sent with every request
   };
 }
 
