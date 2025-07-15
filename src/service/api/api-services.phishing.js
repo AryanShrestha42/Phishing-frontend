@@ -171,27 +171,53 @@ export async function API_GetHistory() {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
+      credentials: "include",
     });
-
     const contentType = response.headers.get("content-type") || "";
     const data = contentType.includes("application/json")
       ? await response.json()
       : await response.text();
-
     if (!response.ok) {
       throw new Error(
         typeof data === "string" ? data : data?.error || "Unknown error"
       );
     }
-
     if (!Array.isArray(data)) {
       throw new Error("Invalid response format: expected array");
     }
-
     return data;
   } catch (error) {
     throw new Error(
       `Failed to fetch history: ${error.message || "Unknown error occurred"}`
+    );
+  }
+}
+
+export async function API_DeleteHistory(id, type) {
+  if (!id || !type) throw new Error("Both id and type are required");
+  try {
+    const response = await fetch(`${getServerIP()}/user/deleteHistory`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ id, type }),
+      credentials: "include",
+    });
+    const contentType = response.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await response.json()
+      : await response.text();
+    if (!response.ok) {
+      throw new Error(
+        typeof data === "string" ? data : data?.error || "Unknown error"
+      );
+    }
+    return typeof data === "string" ? data : data.message;
+  } catch (error) {
+    throw new Error(
+      `Failed to delete history: ${error.message || "Unknown error occurred"}`
     );
   }
 }

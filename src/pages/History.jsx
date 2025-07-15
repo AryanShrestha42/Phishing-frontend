@@ -1,57 +1,9 @@
 // This is a page component, not a reusable UI component.
-import React, { useState } from "react";
-
-const mockHistory = [
-  {
-    id: 1,
-    input: "https://safe-bank.com/login",
-    type: "URL",
-    result: { label: "Safe", color: "green" },
-    intent: null,
-    date: "2024-07-12 14:23",
-  },
-  {
-    id: 2,
-    input:
-      "Your account is locked. Click here to reset: http://phishing-site.com/reset",
-    type: "Message",
-    result: { label: "Phishing", color: "red" },
-    intent: "Credential Theft",
-    date: "2024-07-12 13:10",
-  },
-  {
-    id: 3,
-    input: "http://scam-offer.com/win-prize",
-    type: "URL",
-    result: { label: "Phishing", color: "red" },
-    intent: "Financial Fraud",
-    date: "2024-07-12 12:45",
-  },
-  {
-    id: 4,
-    input: "Congratulations! You've won a free iPhone. Enter your details...",
-    type: "Message",
-    result: { label: "Phishing", color: "red" },
-    intent: "Personal Info Harvesting",
-    date: "2024-07-12 11:12",
-  },
-  {
-    id: 5,
-    input: "https://google.com",
-    type: "URL",
-    result: { label: "Safe", color: "green" },
-    intent: null,
-    date: "2024-07-12 10:30",
-  },
-  {
-    id: 6,
-    input: "Please verify your email address by clicking this link",
-    type: "Message",
-    result: { label: "Safe", color: "green" },
-    intent: null,
-    date: "2024-07-12 09:15",
-  },
-];
+import React, { useState, useEffect } from "react";
+import {
+  API_GetHistory,
+  API_DeleteHistory,
+} from "@/service/api/api-services.phishing";
 
 const getBadgeColor = (color) => {
   switch (color) {
@@ -75,11 +27,40 @@ const getBadgeColor = (color) => {
 const History = () => {
   const [viewRow, setViewRow] = useState(null);
   const [deleteRow, setDeleteRow] = useState(null);
-  const [rows, setRows] = useState(mockHistory);
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
 
-  const handleDelete = (id) => {
-    setRows((prev) => prev.filter((row) => row.id !== id));
-    setDeleteRow(null);
+  useEffect(() => {
+    async function fetchHistory() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await API_GetHistory();
+        setRows(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHistory();
+  }, []);
+
+  const handleDelete = async (id, type) => {
+    setDeleteLoading(true);
+    setDeleteError(null);
+    try {
+      await API_DeleteHistory(id, type);
+      setRows((prev) => prev.filter((row) => row.id !== id));
+      setDeleteRow(null);
+    } catch (err) {
+      setDeleteError(err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   return (
@@ -110,78 +91,132 @@ const History = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {rows.map((row, idx) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-mono text-xs text-gray-500">
-                  {idx + 1}
-                </td>
-                <td className="px-4 py-3 max-w-xs truncate" title={row.input}>
-                  {row.input.length > 40
-                    ? row.input.slice(0, 40) + "..."
-                    : row.input}
-                </td>
-                <td className="px-4 py-3">{row.type}</td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`inline-block px-3 py-1 rounded-full border text-xs font-medium ${getBadgeColor(
-                      row.result.color
-                    )}`}
-                  >
-                    {row.result.label}
-                    {row.intent ? `: ${row.intent}` : ""}
-                  </span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap">{row.date}</td>
-                <td className="px-4 py-3 flex gap-2">
-                  <button
-                    className="p-2 text-blue-700 hover:text-blue-900 transition-colors"
-                    onClick={() => setViewRow(row.id)}
-                    title="View Details"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4"
-                    >
-                      <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
-                      <circle cx="12" cy="12" r="3" />
-                    </svg>
-                  </button>
-                  <button
-                    className="p-2 text-red-600 hover:text-red-800 transition-colors"
-                    onClick={() => setDeleteRow(row.id)}
-                    title="Delete Entry"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="w-4 h-4"
-                    >
-                      <polyline points="3 6 5 6 21 6" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2" />
-                      <line x1="10" y1="11" x2="10" y2="17" />
-                      <line x1="14" y1="11" x2="14" y2="17" />
-                    </svg>
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan={6} className="text-center py-8 text-gray-400">
+                  Loading history...
                 </td>
               </tr>
-            ))}
-            {rows.length === 0 && (
+            ) : error ? (
+              <tr>
+                <td colSpan={6} className="text-center py-8 text-red-400">
+                  {error}
+                </td>
+              </tr>
+            ) : rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="text-center py-8 text-gray-400">
                   No history found.
                 </td>
               </tr>
+            ) : (
+              rows.map((row, idx) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-mono text-xs text-gray-500">
+                    {idx + 1}
+                  </td>
+                  <td
+                    className="px-4 py-3 max-w-xs truncate"
+                    title={row.type === "url" ? row.url : row.content}
+                  >
+                    {row.type === "url"
+                      ? row.url && row.url.length > 40
+                        ? row.url.slice(0, 40) + "..."
+                        : row.url
+                      : row.content && row.content.length > 40
+                      ? row.content.slice(0, 40) + "..."
+                      : row.content}
+                  </td>
+                  <td className="px-4 py-3">
+                    {row.type === "url" ? "URL" : "Message"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full border text-xs font-medium ${getBadgeColor(
+                        row.type === "url"
+                          ? row.label === 0
+                            ? "green"
+                            : row.label === 1
+                            ? "red"
+                            : "gray"
+                          : row.text_label === 0
+                          ? "green"
+                          : row.text_label === 1
+                          ? "red"
+                          : "gray"
+                      )}`}
+                    >
+                      {row.type === "url"
+                        ? row.label === 0
+                          ? "Safe"
+                          : row.label === 1
+                          ? "Phishing"
+                          : "Unknown"
+                        : row.text_label === 0
+                        ? "Safe"
+                        : row.text_label === 1
+                        ? "Phishing"
+                        : "Unknown"}
+                      {row.type === "message" &&
+                      row.url_label !== undefined &&
+                      row.url_label !== null
+                        ? ` (URL: ${
+                            row.url_label === 0
+                              ? "Safe"
+                              : row.url_label === 1
+                              ? "Phishing"
+                              : "Unknown"
+                          })`
+                        : ""}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {row.timestamp}
+                  </td>
+                  <td className="px-4 py-3 flex gap-2">
+                    <button
+                      className="p-2 text-blue-700 hover:text-blue-900 transition-colors"
+                      onClick={() => setViewRow(row.id)}
+                      title="View Details"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-4 h-4"
+                      >
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </button>
+                    <button
+                      className="p-2 text-red-600 hover:text-red-800 transition-colors"
+                      onClick={() => setDeleteRow(row.id)}
+                      title="Delete Entry"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="w-4 h-4"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m5 0V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2" />
+                        <line x1="10" y1="11" x2="10" y2="17" />
+                        <line x1="14" y1="11" x2="14" y2="17" />
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
@@ -215,29 +250,36 @@ const History = () => {
               <div>
                 <span className="font-semibold">Input:</span>{" "}
                 <span className="break-words">
-                  {rows.find((r) => r.id === viewRow)?.input}
+                  {/* Data for viewRow would be fetched here */}
+                  {/* For now, it will show a placeholder */}
+                  Placeholder Input
                 </span>
               </div>
               <div>
                 <span className="font-semibold">Type:</span>{" "}
-                {rows.find((r) => r.id === viewRow)?.type}
+                {/* Data for viewRow would be fetched here */}
+                {/* For now, it will show a placeholder */}
+                Placeholder Type
               </div>
               <div>
                 <span className="font-semibold">Detection Result:</span>{" "}
                 <span
                   className={`inline-block px-3 py-1 rounded-full border text-xs font-medium ${getBadgeColor(
-                    rows.find((r) => r.id === viewRow)?.result.color
+                    // Data for viewRow would be fetched here
+                    // For now, it will show a placeholder
+                    "gray"
                   )}`}
                 >
-                  {rows.find((r) => r.id === viewRow)?.result.label}
-                  {rows.find((r) => r.id === viewRow)?.intent
-                    ? `: ${rows.find((r) => r.id === viewRow)?.intent}`
-                    : ""}
+                  {/* Data for viewRow would be fetched here */}
+                  {/* For now, it will show a placeholder */}
+                  Placeholder Result
                 </span>
               </div>
               <div>
                 <span className="font-semibold">Date & Time:</span>{" "}
-                {rows.find((r) => r.id === viewRow)?.date}
+                {/* Data for viewRow would be fetched here */}
+                {/* For now, it will show a placeholder */}
+                Placeholder Date
               </div>
             </div>
           </div>
@@ -273,18 +315,28 @@ const History = () => {
             <p className="mb-6 text-gray-700">
               Are you sure you want to delete this entry?
             </p>
+            {deleteError && (
+              <div className="mb-4 text-red-500 text-sm text-center">
+                {deleteError}
+              </div>
+            )}
             <div className="flex justify-end gap-3">
               <button
                 className="px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium"
                 onClick={() => setDeleteRow(null)}
+                disabled={deleteLoading}
               >
                 Cancel
               </button>
               <button
                 className="px-4 py-2 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium"
-                onClick={() => handleDelete(deleteRow)}
+                onClick={() => {
+                  const row = rows.find((r) => r.id === deleteRow);
+                  if (row) handleDelete(row.id, row.type);
+                }}
+                disabled={deleteLoading}
               >
-                Delete
+                {deleteLoading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
