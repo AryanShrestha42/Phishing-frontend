@@ -58,14 +58,6 @@ function App() {
             <Route path="history" element={<History />} />
           </Route>
           {/* Catch all route - redirect to login if not authenticated */}
-          <Route
-            path="*"
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

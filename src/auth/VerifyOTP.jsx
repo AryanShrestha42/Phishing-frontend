@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { API_VerifyOTP } from "@/service/api/api-services.auth";
+import { showSwal } from "@/lib/showSwal";
 
 const VerifyOTP = () => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
@@ -38,19 +37,16 @@ const VerifyOTP = () => {
     e.preventDefault();
     const otpString = otp.join("");
     if (!email || otpString.length !== 6) {
-      setError("Please fill all fields correctly.");
+      showSwal("warning", "Please fill all fields correctly.");
       return;
     }
-    setError("");
     setIsLoading(true);
-    setSuccess("");
-
     try {
       const res = await API_VerifyOTP(email, otpString);
-      setSuccess(res.message || "OTP verified successfully!");
+      showSwal("success", res.message || "OTP verified successfully!");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setError(err.message || "OTP verification failed.");
+      showSwal("error", err.message || "OTP verification failed.");
     } finally {
       setIsLoading(false);
     }
@@ -58,17 +54,14 @@ const VerifyOTP = () => {
 
   const handleResendOTP = () => {
     if (!email) {
-      setError("Please enter your email first.");
+      showSwal("warning", "Please enter your email first.");
       return;
     }
-    setError("");
     setIsLoading(true);
-
-    // TODO: Add resend OTP API call here
-
+    // Simulate resend OTP (replace with actual API call if needed)
     setTimeout(() => {
+      showSwal("info", "OTP has been sent to your email.");
       setIsLoading(false);
-      setSuccess("OTP has been resent to your email!");
     }, 1000);
   };
 
@@ -77,16 +70,8 @@ const VerifyOTP = () => {
       <h1 className="text-3xl font-bold m-5 text-blue-600">PhishGuard</h1>
       <div className="relative z-10 w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-10 flex flex-col items-center">
         <h2 className="text-xl font-bold text-center mb-6 text-gray-800">
-          Verify Your Email
+          Verify OTP
         </h2>
-        <p className="text-gray-600 text-center mb-6 text-sm">
-          Please enter the OTP sent to your email address to verify your
-          account.
-        </p>
-        {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
-        {success && (
-          <div className="text-green-500 mb-4 text-center">{success}</div>
-        )}
         <form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Email Input with Icon */}
           <div className="relative">
@@ -110,7 +95,7 @@ const VerifyOTP = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-5 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
             />
           </div>
@@ -125,7 +110,7 @@ const VerifyOTP = () => {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-12 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-center text-xl font-bold text-gray-800 shadow"
+                className="w-12 h-12 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-center text-xl font-bold text-gray-800 shadow transition-all duration-200 ease-in-out"
                 maxLength="1"
                 required
               />
@@ -135,7 +120,7 @@ const VerifyOTP = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-blue-700 transition shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-black transition-all duration-200 ease-in-out shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Verifying..." : "Verify OTP"}
           </button>

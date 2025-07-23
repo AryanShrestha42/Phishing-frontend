@@ -50,14 +50,16 @@ const DetectURL = () => {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
-          className="flex-grow px-6 py-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+          className="flex-grow px-6 py-4 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
           disabled={loading}
         />
         <button
           type="submit"
-          className={`${
-            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-          } text-white px-8 py-4 rounded-xl font-medium transition`}
+          className={`text-white px-8 py-4 rounded-xl font-medium transition-all duration-200 ease-in-out ${
+            loading
+              ? "bg-blue-400"
+              : "bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-black"
+          }`}
           disabled={loading}
         >
           {loading ? "Scanning..." : "Scan URL"}

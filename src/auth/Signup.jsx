@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_SignUp } from "@/service/api/api-services.auth";
+import { showSwal } from "@/lib/showSwal";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,24 +15,21 @@ const Signup = () => {
     e.preventDefault();
 
     if (!username || !email || !password) {
-      setError("Please fill in all fields.");
+      showSwal("warning", "Please fill in all fields.");
       return;
     }
 
-    setError("");
-    setMessage("");
     setLoading(true);
 
     try {
       const res = await API_SignUp(username, email, password);
-      setMessage(res.message || "Signup successful!");
-
+      showSwal("success", res.message || "Signup successful!");
       // Redirect user to OTP verification page with email as query param
       setTimeout(() => {
         navigate(`/verify-otp?email=${encodeURIComponent(email)}`);
       }, 1500);
     } catch (err) {
-      setError(err.message || "Signup failed.");
+      showSwal("error", err.message || "Signup failed.");
     } finally {
       setLoading(false);
     }
@@ -42,8 +38,6 @@ const Signup = () => {
   // Clear messages on input change to improve UX
   const handleInputChange = (setter) => (e) => {
     setter(e.target.value);
-    setError("");
-    setMessage("");
   };
 
   return (
@@ -53,8 +47,6 @@ const Signup = () => {
         <h2 className="text-xl font-bold text-center mb-6 text-gray-800">
           Sign Up
         </h2>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-        {message && <div className="text-green-600 mb-4">{message}</div>}
         <form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Username Input with Icon */}
           <div className="relative">
@@ -78,7 +70,7 @@ const Signup = () => {
               placeholder="Username"
               value={username}
               onChange={handleInputChange(setUsername)}
-              className="w-full pl-10 pr-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-5 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
             />
           </div>
@@ -105,7 +97,7 @@ const Signup = () => {
               placeholder="Email"
               value={email}
               onChange={handleInputChange(setEmail)}
-              className="w-full pl-10 pr-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-5 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
             />
           </div>
@@ -133,13 +125,13 @@ const Signup = () => {
               placeholder="Password"
               value={password}
               onChange={handleInputChange(setPassword)}
-              className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-12 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center transition-all duration-200 ease-in-out hover:opacity-75"
             >
               {showPassword ? (
                 <svg
@@ -178,7 +170,7 @@ const Signup = () => {
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-blue-700 transition shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-black transition-all duration-200 ease-in-out shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Signing Up..." : "Sign Up"}
           </button>

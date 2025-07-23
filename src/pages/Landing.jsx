@@ -37,7 +37,7 @@ const Landing = () => {
                 behavior: "smooth",
               });
             }}
-            className="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg text-lg hover:bg-blue-700 transition font-medium"
+            className="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg text-lg font-medium transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-600 hover:to-black"
           >
             Get Started
           </button>
@@ -153,7 +153,7 @@ const Landing = () => {
             </p>
             <Link
               to="/detectURL"
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-blue-600 hover:to-black"
             >
               Scan URL
             </Link>
@@ -183,7 +183,7 @@ const Landing = () => {
             </p>
             <Link
               to="/detectIntent"
-              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition font-medium"
+              className="bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-green-600 hover:to-black"
             >
               Analyze Intent
             </Link>
@@ -214,7 +214,7 @@ const Landing = () => {
               before you visit them.
             </p>
             <button
-              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition font-medium cursor-pointer"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 ease-in-out hover:bg-gradient-to-r hover:from-purple-600 hover:to-black cursor-pointer"
               disabled
             >
               Install
@@ -307,7 +307,7 @@ const Landing = () => {
         </div>
       </section>
 
-      <Footer />
+      <Footer className="bg-white text-gray-900" />
     </>
   );
 };

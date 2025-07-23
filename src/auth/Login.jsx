@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { API_Login } from "@/service/api/api-services.auth";
 import { useAuth } from "@/context/AuthContext";
+import { showSwal } from "@/lib/showSwal";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,45 +17,36 @@ const Login = () => {
     e.preventDefault();
 
     if (!username || !password) {
-      setError("Please fill up all fields.");
-      setSuccess("");
+      showSwal("warning", "Please fill up all fields.");
       return;
     }
 
-    setError("");
-    setSuccess("");
     setIsLoading(true);
 
     try {
       const response = await API_Login(username, password);
 
       if (response.message === "Login successful") {
-        setSuccess("Logged in successfully!");
-        setError("");
-
+        showSwal("success", "Logged in successfully!");
         // Store user data and token using auth context
         const userData = {
           username: response.username,
           email: response.email,
         };
         login(userData, response.session_token);
-
         setTimeout(() => {
           // Redirect to the page they were trying to access, or landing page
           const from = location.state?.from?.pathname || "/";
           navigate(from, { replace: true });
         }, 1000);
       } else {
-        setError("Invalid credentials. Please try again.");
-        setSuccess("");
+        showSwal("error", "Invalid credentials. Please try again.");
       }
     } catch (err) {
-      // Always show a string error message
       let msg = "Login failed. Please try again.";
       if (typeof err === "string") msg = err;
       else if (err && err.message) msg = err.message;
-      setError(msg);
-      setSuccess("");
+      showSwal("error", msg);
     } finally {
       setIsLoading(false);
     }
@@ -69,8 +59,6 @@ const Login = () => {
         <h2 className="text-xl font-bold text-center mb-6 text-gray-800">
           Login
         </h2>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-        {success && <div className="text-green-500 mb-4">{success}</div>}
         <form className="w-full flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Username Input with Icon */}
           <div className="relative">
@@ -94,7 +82,7 @@ const Login = () => {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full pl-10 pr-5 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-5 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
               disabled={isLoading}
             />
@@ -123,14 +111,14 @@ const Login = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-12 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow"
+              className="w-full pl-10 pr-12 py-3 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow transition-all duration-200 ease-in-out"
               required
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center transition-all duration-200 ease-in-out hover:opacity-75"
               disabled={isLoading}
             >
               {showPassword ? (
@@ -169,7 +157,7 @@ const Login = () => {
 
           <button
             type="submit"
-            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-blue-700 transition shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl text-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-black transition-all duration-200 ease-in-out shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Login"}

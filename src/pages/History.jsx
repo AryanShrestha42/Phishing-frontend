@@ -4,6 +4,7 @@ import {
   API_GetHistory,
   API_DeleteHistory,
 } from "@/service/api/api-services.phishing";
+import { showSwal } from "@/lib/showSwal";
 
 const getBadgeColor = (color) => {
   switch (color) {
@@ -31,7 +32,6 @@ const History = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteError, setDeleteError] = useState(null);
 
   useEffect(() => {
     async function fetchHistory() {
@@ -51,13 +51,13 @@ const History = () => {
 
   const handleDelete = async (id, type) => {
     setDeleteLoading(true);
-    setDeleteError(null);
     try {
       await API_DeleteHistory(id, type);
       setRows((prev) => prev.filter((row) => row.id !== id));
       setDeleteRow(null);
+      showSwal("success", "Entry deleted successfully.");
     } catch (err) {
-      setDeleteError(err.message);
+      showSwal("error", err.message || "Failed to delete entry.");
     } finally {
       setDeleteLoading(false);
     }
@@ -175,7 +175,7 @@ const History = () => {
                   </td>
                   <td className="px-4 py-3 flex gap-2">
                     <button
-                      className="p-2 text-blue-700 hover:text-blue-900 transition-colors"
+                      className="p-2 text-blue-700 hover:bg-gray-100 transition-all duration-200 ease-in-out rounded-lg"
                       onClick={() => setViewRow(row.id)}
                       title="View Details"
                     >
@@ -194,7 +194,7 @@ const History = () => {
                       </svg>
                     </button>
                     <button
-                      className="p-2 text-red-600 hover:text-red-800 transition-colors"
+                      className="p-2 text-red-600 hover:bg-gray-100 transition-all duration-200 ease-in-out rounded-lg"
                       onClick={() => setDeleteRow(row.id)}
                       title="Delete Entry"
                     >
@@ -227,7 +227,7 @@ const History = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 relative">
             <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
+              className="absolute top-3 right-3 text-gray-400 hover:bg-gray-100 transition-all duration-200 ease-in-out rounded-full"
               onClick={() => setViewRow(null)}
               aria-label="Close"
             >
@@ -291,7 +291,7 @@ const History = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative">
             <button
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700"
+              className="absolute top-3 right-3 text-gray-400 hover:bg-gray-100 transition-all duration-200 ease-in-out rounded-full"
               onClick={() => setDeleteRow(null)}
               aria-label="Close"
             >
@@ -315,21 +315,21 @@ const History = () => {
             <p className="mb-6 text-gray-700">
               Are you sure you want to delete this entry?
             </p>
-            {deleteError && (
+            {/* deleteError && (
               <div className="mb-4 text-red-500 text-sm text-center">
                 {deleteError}
               </div>
-            )}
+            ) */}
             <div className="flex justify-end gap-3">
               <button
-                className="px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium"
+                className="px-4 py-2 rounded-lg border border-gray-300 bg-gray-50 hover:bg-gray-100 text-gray-700 text-sm font-medium transition-all duration-200 ease-in-out"
                 onClick={() => setDeleteRow(null)}
                 disabled={deleteLoading}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium"
+                className="px-4 py-2 rounded-lg border border-red-300 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium transition-all duration-200 ease-in-out"
                 onClick={() => {
                   const row = rows.find((r) => r.id === deleteRow);
                   if (row) handleDelete(row.id, row.type);

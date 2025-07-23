@@ -41,7 +41,7 @@ const Navbar = () => {
   }, [showAccountMenu]);
 
   return (
-    <nav className="bg-gray-50 w-full py-4 shadow font-sans">
+    <nav className="bg-white w-full py-4 shadow font-sans text-gray-900">
       <div className="max-w-7xl mx-auto flex items-center justify-between ">
         {/* Logo and Brand */}
         <div className="flex items-center space-x-2">
@@ -108,7 +108,9 @@ const Navbar = () => {
           <button
             ref={accountBtnRef}
             onClick={() => setShowAccountMenu((v) => !v)}
-            className="bg-blue-600 text-white p-3 rounded-full shadow-lg font-medium hover:bg-blue-700 transition flex items-center gap-2 focus:outline-none"
+            className="bg-blue-600 text-white p-3 rounded-full shadow-lg font-medium hover:bg-blue-700 transition-all duration-300 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 "
+            type="button"
+            aria-label="Account menu"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

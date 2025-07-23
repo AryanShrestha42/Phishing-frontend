@@ -79,16 +79,18 @@ const DetectIntention = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           rows={5}
-          className="px-6 py-4 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow resize-y min-h-[120px]"
+          className="px-6 py-4 rounded-xl border-2 border-gray-400 focus:ring-2 focus:ring-blue-400 outline-none text-base placeholder-gray-400 shadow resize-y min-h-[120px] transition-all duration-200 ease-in-out"
           disabled={loading}
           required
         />
 
         <button
           type="submit"
-          className={`${
-            loading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-          } text-white px-8 py-4 rounded-xl font-medium transition self-end`}
+          className={`text-white px-8 py-4 rounded-xl font-medium transition-all duration-200 ease-in-out self-end ${
+            loading
+              ? "bg-blue-400"
+              : "bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-black"
+          }`}
           disabled={loading}
         >
           {loading ? "Analyzing..." : "Analyze Intent"}
@@ -111,12 +113,7 @@ const DetectIntention = () => {
             return (
               <>
                 <h2 className="text-4xl font-bold text-gray-800 mb-4 text-center">
-                  Analysis Result:{" "}
-                  <span
-                    className={`font-bold ${getStatusColor(overallStatus)}`}
-                  >
-                    {getStatusText(overallStatus)}
-                  </span>
+                  Analysis Result
                 </h2>
 
                 <div className="w-full space-y-6 mt-6">
